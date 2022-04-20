@@ -124,3 +124,57 @@ centerx : 로봇의 생성 경로인듯
 - 320으로 조정하는 이유 : 영상의 가로폭은 1000이며, 중앙값은 500일 때, 중앙에서 본 왼쪽과 오른쪽 x 값이 보통 180, 820 이지 않을까 생각
 
 centrex.item(350) : 이 값으로 차량의 이동 방향을 정하는데, 이는 2차 방정식에서 y가 350일 때의 x 결과값이며, 그 값으로 조향하는 것 같다.
+
+---
+
+## detect_sign
+
+표지판을 읽어오는 launch 파일
+
+launch 파일에서 mission 변수로 intersection, construction, parking, level_crossing, tunnel의 변수가 있다. 각각의 변수명에 따른 _sign node가 존재한다.
+
+---
+
+## detect_intersection
+
+> **detect_intersection_sign**
+> 
+
+### __init__
+
+fnPreproc 함수 실행, 이미지 타입 설정, 카메라로 부터 이미지를 받아 cbFindTrafficSign 함수에 넘겨줌, traffic_sign에 대해서 publisher을 만듦 TrafficSign = Enum(’TrafficSign’, ‘intersection left rigght’) 을 통해 0, 1 로 넘겨줌
+
+counter = 1로 초기화
+
+---
+
+### fnPreproc
+
+검출된 이미지와 비교하기전, 사전에 비교대상을 미리 준비하는 함수
+
+cv2.SFIT_create() : 이미지끼리 서로 매칭이 되는지 확인할 때 각 이미지에서의 특징이 되는 부분끼리 비교하는 함수
+
+detectAndCompute() : 특징점과 특징 디스크럽터를 동시에 계산함.
+
+FLANN 모든 디스크립터를 전수 조사하기에는 속도가 느려지므로 FLANN을 사용하여 이웃하는 디스크립터끼리 비교하는 함수 → algorithm 선택키가 0 이면 BFMatcher와 동일한데 이것은 모든 디스크립터를 전수 조사하는 경우임
+
+---
+
+### cbFindTrafficSign
+
+1/5 fram drop을 한다고 되어있지만 code 상으로 1/3 한 듯
+
+→ 이 코드 전체를 분석하는 것은 의미가 없어 보인다. 어쨌든 특징점을 비교하여 폴더내에 있는 이미지와 현재 들어오는 이미지에서 같은 것을 찾는 것
+
+---
+
+> **detect_intersection**
+> 
+
+launch 파일에는 별것 없이 단순히 detect_intersection nodes 실행
+
+### __init__
+
+detect_intersection_sign nodes에서 /detect/traffic_sign 값을 cbInvokeByTrafficSign 함수로 넘겨줌, 
+
+/detect/intersection_order 값을 cbIntersectionOrder 함수로 넘겨주는데 intersction_order값이 어디서 들어오는지 못 찾음 /control/moving/complete cbMovingComplete 함수로 넘겨줌
