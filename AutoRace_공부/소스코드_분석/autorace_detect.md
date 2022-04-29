@@ -131,7 +131,41 @@ centrex.item(350) : 이 값으로 차량의 이동 방향을 정하는데, 이�
 
 표지판을 읽어오는 launch 파일
 
-launch 파일에서 mission 변수로 intersection, construction, parking, level_crossing, tunnel의 변수가 있다. 각각의 변수명에 따른 _sign node가 존재한다.
+launch 파일에서 mission 변수로 intersection, construction, parking, level_crossing, tunnel의 변수가 있다. 각각의 변수명에 따른 _sign node가 존재, 실행한다.
+
+---
+
+### detect_traffic_light
+
+cbGetImage, cbTrafficLightFinished 함수 실행, 이미지 변환, 종료신호 받기 전까지 
+
+fnFindTrafficLight 함수 실행,
+
+여러 publish, subscribe 선언, HSV 범위 설정
+
+---
+
+### cbGetImage
+
+1/3 실행 이 함수는 이미지 데이터를 ROS에서 사용할 수 있도록 변환하는 코드 인듯,,
+
+---
+
+### fnFindTrafficLight
+
+fnMastGreenTrafficLight 함수 실행 → 1/3 하는 이유가 여기에 있는데, 1/3 에서 만들어 두었던 cbGetImage에 대해서 각각 status1, status2, status3를 생성하여, 초록색, 노란색, 빨간색 순으로 검사, 초록색이 status1에 3번 검출되면 초록불로 인식하여 pub_traffic_light(CurrentMode.lane_following.value (1) → traffic_light_core_mode_decider 넘겨줌
+
+---
+
+### fnMask(Green, Red, Yellow)TrafficLight
+
+이미지에서 (초록, 빨강, 노란)색으로 inrange된 이미지를 보색처리하여 return 함. 보색 처리한 것을 fnFindCircleOfTrafficLight 함수로 넘겨줌 → 그렇다면 범위 영역의 색만 0 → 나머지는 1 값을 갖을듯
+
+---
+
+### fnFindCircleOfTrafficLight
+
+cv2.SimpleBlobDetector_Params() → 이진 스케일로 연결된 픽셀 그룹을 만들며 detect(mask)를 통해서 mask 범위에서 탐색함 → return 값은 좌표이다.. 보색된 이미지로 detect하기 때문에 매개변수로 find_color를 넘겨주어 알맞은 status 를 반환한다. ( 좌표에 따라 반환값이 다르다??? )
 
 ---
 
@@ -162,8 +196,6 @@ FLANN 모든 디스크립터를 전수 조사하기에는 속도가 느려지므
 
 ### cbFindTrafficSign
 
-1/5 fram drop을 한다고 되어있지만 code 상으로 1/3 한 듯
-
 → 이 코드 전체를 분석하는 것은 의미가 없어 보인다. 어쨌든 특징점을 비교하여 폴더내에 있는 이미지와 현재 들어오는 이미지에서 같은 것을 찾는 것
 
 ---
@@ -175,6 +207,8 @@ launch 파일에는 별것 없이 단순히 detect_intersection nodes 실행
 
 ### __init__
 
-detect_intersection_sign nodes에서 /detect/traffic_sign 값을 cbInvokeByTrafficSign 함수로 넘겨줌, 
+detect_intersection_sign nodes에서 /detect/traffic_sign 값(intersection sign, left sign, right sign)을 cbInvokeByTrafficSign 함수로 넘겨줌
 
-/detect/intersection_order 값을 cbIntersectionOrder 함수로 넘겨주는데 intersction_order값이 어디서 들어오는지 못 찾음 /control/moving/complete cbMovingComplete 함수로 넘겨줌
+/detect/intersection_order 값을 cbIntersectionOrder 함수로 넘겨주며, turtlebot3_autorace_core의 intersection_core_node_controller nodes에서 /detect/intersection_order 값을 넘겨준다 /control/moving/complete cbMovingComplete 함수로 넘겨줌
+
+##
