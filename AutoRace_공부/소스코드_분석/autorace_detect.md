@@ -133,9 +133,12 @@ centrex.item(350) : 이 값으로 차량의 이동 방향을 정하는데, 이�
 
 launch 파일에서 mission 변수로 intersection, construction, parking, level_crossing, tunnel의 변수가 있다. 각각의 변수명에 따른 _sign node가 존재, 실행한다.
 
+image가 compressed 된 것은 나중에 imdecode를 통해서 압축해제를 해야함
+
 ---
 
-### detect_traffic_light
+> **detect_traffic_light**
+> 
 
 cbGetImage, cbTrafficLightFinished 함수 실행, 이미지 변환, 종료신호 받기 전까지 
 
@@ -148,6 +151,10 @@ fnFindTrafficLight 함수 실행,
 ### cbGetImage
 
 1/3 실행 이 함수는 이미지 데이터를 ROS에서 사용할 수 있도록 변환하는 코드 인듯,,
+
+ 이 함수가 처음 실행해서 image 데이터를 받으면 is_image_available = True로 변환시켜
+
+while not rospy.is_shutdown() 구조를 통해 fnFindTrafficLight 함수 실행
 
 ---
 
@@ -196,7 +203,7 @@ FLANN 모든 디스크립터를 전수 조사하기에는 속도가 느려지므
 
 ### cbFindTrafficSign
 
-→ 이 코드 전체를 분석하는 것은 의미가 없어 보인다. 어쨌든 특징점을 비교하여 폴더내에 있는 이미지와 현재 들어오는 이미지에서 같은 것을 찾는 것
+→ 이 코드 전체를 분석하는 것은 의미가 없어 보인다. 어쨌든 특징점을 비교하여 폴더내에 있는 이미지와 현재 들어오는 이미지에서 비슷한 이미지를 찾는 것
 
 ---
 
@@ -210,5 +217,3 @@ launch 파일에는 별것 없이 단순히 detect_intersection nodes 실행
 detect_intersection_sign nodes에서 /detect/traffic_sign 값(intersection sign, left sign, right sign)을 cbInvokeByTrafficSign 함수로 넘겨줌
 
 /detect/intersection_order 값을 cbIntersectionOrder 함수로 넘겨주며, turtlebot3_autorace_core의 intersection_core_node_controller nodes에서 /detect/intersection_order 값을 넘겨준다 /control/moving/complete cbMovingComplete 함수로 넘겨줌
-
-##
